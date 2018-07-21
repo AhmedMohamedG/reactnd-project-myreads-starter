@@ -3,6 +3,16 @@ import React, { Component } from 'react';
 
 class Books extends React.Component{
 	
+	state={
+
+		shelf:""
+	}
+
+	toggleShelf = (shelf) => {
+
+	  this.setState({shelf})
+	  console.log(shelf)
+	}
 		
 	render(){
 	    const {book} = this.props
@@ -17,7 +27,10 @@ class Books extends React.Component{
                     	backgroundImage:`url(${book.imageLinks.thumbnail})`}}>
                     	</div>
                     	<div className="book-shelf-changer">
-                      		<select>
+                      		<select 
+                      		onChange ={ (event) => {this.toggleShelf(event.target.value)}} 
+                      		value ={this.state.shelf}
+                      		>
                         		<option value="move" disabled>Move to...</option>
                         		<option value="currentlyReading">Currently Reading</option>
                         		<option value="wantToRead">Want to Read</option>

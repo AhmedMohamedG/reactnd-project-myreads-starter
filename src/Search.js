@@ -15,6 +15,9 @@ class Search extends React.Component{
 	componentDidMount() {
     	BooksAPI.getAll().then((books) => {
       	this.setState({books})
+      	console.log(books.map((book)=>{return book.shelf}) )
+      	console.log(typeof this.state.books )
+
    	})}
 
 	updateQuery = (value) => {
