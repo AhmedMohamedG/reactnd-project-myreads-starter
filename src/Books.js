@@ -14,13 +14,17 @@ class Books extends React.Component{
    const {book} = this.props
       if(book.shelf){
         this.setState({shelf: book.shelf})
+        document.getElementsByTagName("select")[0].setAttribute("value", book.shelf);
+
       }
+      console.log(book)
+//alert("mount")
   }
 
 	toggleShelf = (event) => {
 
 	  this.setState({shelf: event.target.value})
-	  console.log(this.state.shelf)
+	 // console.log(this.state.shelf)
     this.props.toggleShelf(this.props.book, event.target.value)
      BooksAPI.update(this.props.book, event.target.value).then((response) => { 
     })

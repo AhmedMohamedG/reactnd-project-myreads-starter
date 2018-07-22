@@ -4,64 +4,56 @@ import * as BooksAPI from './BooksAPI'
 import Books from "./Books";
 
 
-class BookList extends React.Component{
+class BookList extends Component{
 
 	state = {
 		books: [],
    		query: '',
    		showingBooks: [],
-   		currentlyReading:[],
-   		wantToRead:[],
-   		read:[]
 		}
 
 	componentDidMount() {
 		
     	BooksAPI.getAll().then((books) => {
     		this.setState({books}) 
-        this.distribution(this.state.books);     	
+        this.distribution(books);     	
    })}
-componentWillUpdate(){
-
-      BooksAPI.getAll().then((books) => {
-        this.setState({books}) 
-        this.distribution(this.state.books);  
-})}
 
       
-distribution=(books)=>{
-      let currentlyReading=[];
-      let wantToRead=[];
-      let read=[];
-      books.map((book)=>{
-            if(book.shelf === "currentlyReading"){            
-              currentlyReading.push(book)            
-            }else if(book.shelf === "wantToRead"){
-              wantToRead.push(book)
-            }else if(book.shelf === "read"){
-              read.push(book)
-            } 
-          })
-        this.setState({currentlyReading,wantToRead,read})
-       
-}
+  distribution=()=>{
+
+    let currentlyReading=[];
+    let wantToRead=[];
+    let read=[];
+    this.state.books.forEach((book)=>{
+          if(book.shelf === "currentlyReading"){            
+            currentlyReading.push(book)            
+          }else if(book.shelf === "wantToRead"){
+            wantToRead.push(book)
+          }else if(book.shelf === "read"){
+            read.push(book)
+          } 
+        })
+    let shelfsarr = [currentlyReading,wantToRead,read]
+    return   shelfsarr       
+  }
   updateShelf=(book,shelf)=>{
 
-           if(shelf === "currentlyReading" && (this.state.currentlyReading.findIndex(b => b.id === book.id) < 0)){
+           /*if(shelf === "currentlyReading" && (this.state.currentlyReading.findIndex(b => b.id === book.id) < 0)){
               this.setState({currentlyReading:[...this.state.currentlyReading,book]})
             }else if(shelf === "wantToRead" && (this.state.wantToRead.findIndex(b => b.id === book.id) < 0)){
               this.setState({wantToRead:[...this.state.wantToRead,book]})
             }else if(shelf === "read"&& (this.state.read.findIndex(b => b.id === book.id) < 0)){
               this.setState({read:[...this.state.read,book]})
-            } 
+            } */
 
-            BooksAPI.update(book, shelf).then((response) => {
-   
-
-             })
-
+    BooksAPI.update(book, shelf).then(()=>(  BooksAPI.getAll().then((books) => {
+    this.setState({books}) 
+})))
+  
   }
 	render() {
+
   		return (
           <div className="list-books">
             <div className="list-books-title">
@@ -73,7 +65,7 @@ distribution=(books)=>{
                   <h2 className="bookshelf-title">Currently Reading</h2>
                   <div className="bookshelf-books">
                     <ol className="books-grid">
-                    {this.state.currentlyReading.map((book)=>{
+                    {this.distribution()[0].map((book)=>{
                         return <Books key={book.id}
                                book={book}
                               toggleShelf={(book, shelf) => this.updateShelf(book, shelf)}
@@ -88,10 +80,10 @@ distribution=(books)=>{
                   <div className="bookshelf-books">
                     <ol className="books-grid">
                       
-                    {this.state.wantToRead.map((book)=>{
-                      return <Books 
-                      book={book}
-                      toggleShelf={(book, shelf) => this.updateShelf(book, shelf)}
+                    {this.distribution()[1].map((book)=>{
+                      return <Books key={book.id}
+                        book={book}
+                        toggleShelf={(book, shelf) => this.updateShelf(book, shelf)}
                                />                                                                     
                     })}
                     </ol>
@@ -101,8 +93,8 @@ distribution=(books)=>{
                   <h2 className="bookshelf-title">Read</h2>
                   <div className="bookshelf-books">
                     <ol className="books-grid">                        
-                    {this.state.read.map((book)=>{
-                      return <Books 
+                    {this.distribution()[2].map((book)=>{
+                      return <Books key={book.id}
                               book={book}
                      toggleShelf={(book, shelf) => this.updateShelf(book, shelf)}
                              />                         
