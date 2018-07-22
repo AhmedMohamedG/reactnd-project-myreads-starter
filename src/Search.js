@@ -7,11 +7,19 @@ class Search extends React.Component{
 	
 	state = {
 		books: [],
-   		query: '',
-   		showingBooks: []
+   	query: '',
+   	showingBooks: []
 
 		}
 
+  updateShelf=(book,shelf)=>{
+
+            BooksAPI.update(book, shelf).then((response) => {
+  
+
+             })
+
+  }
 	componentDidMount() {
     	BooksAPI.getAll().then((books) => {
       	this.setState({books})
@@ -19,14 +27,20 @@ class Search extends React.Component{
       	console.log(typeof this.state.books )
 
    	})}
+  componentWillUpdate(){
 
-	updateQuery = (value) => {
+      BooksAPI.getAll().then((books) => {
+        this.setState({books}) 
+})}    
 
-		this.setState({query: value.trim()})
+	updateQuery = (event) => {
+		this.setState({query: event.target.value})
+    console.log("value is " +  event.target.value+ " state is " +this.state.query)
+
 		const{ query ,books  } = this.state
  		let showingBooks = []
-   		if (query) {
-     		BooksAPI.search(query).then(response => {
+   		if (event.target.value) {
+     		BooksAPI.search(event.target.value).then(response => {
        		if (response.length) {
           		showingBooks = response.map(b => {
           	 	const	oldBook = books.find(book => {book.id === b.id});
@@ -43,6 +57,7 @@ class Search extends React.Component{
     	else {
       		this.setState({showingBooks})
     		}
+
      }
 
 	render() {
@@ -57,8 +72,8 @@ class Search extends React.Component{
                		<input 
                 	type="text"
                 	placeholder="Search by title or author"
-                	onChange={(event)=> this.updateQuery(event.target.value)}
-					value = {this.state.query}
+                	onChange={ this.updateQuery}
+					value = {this.state.query.toString()}
                 	 />
           		</div>
          	</div>
@@ -66,7 +81,10 @@ class Search extends React.Component{
            		<ol className="books-grid">
                 {this.state.showingBooks && this.state.showingBooks.map((book, i) => (
 				 <Books 
+         key={book.id}
                 book={book}
+                toggleShelf={(book, shelf) => this.updateShelf(book, shelf)}
+
                 	/>
 				))}
                 </ol> 

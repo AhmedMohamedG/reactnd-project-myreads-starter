@@ -16,24 +16,51 @@ class BookList extends React.Component{
 		}
 
 	componentDidMount() {
-		let currentlyReading=[];
-   		let wantToRead=[];
-   		let read=[];
+		
     	BooksAPI.getAll().then((books) => {
-    		this.setState({books})      	
-        books.map((book)=>{
-            if(book.shelf === "currentlyReading"){
-            	currentlyReading.push(book)
-            }else if(book.shelf === "wantToRead"){
-            	wantToRead.push(book)
-            }else if(book.shelf === "read"){
-            	read.push(book)
-            } })
-        this.setState({currentlyReading})
-        this.setState({wantToRead})
-        this.setState({read})
+    		this.setState({books}) 
+        this.distribution(this.state.books);     	
    })}
+componentWillUpdate(){
 
+      BooksAPI.getAll().then((books) => {
+        this.setState({books}) 
+        this.distribution(this.state.books);  
+})}
+
+      
+distribution=(books)=>{
+      let currentlyReading=[];
+      let wantToRead=[];
+      let read=[];
+      books.map((book)=>{
+            if(book.shelf === "currentlyReading"){            
+              currentlyReading.push(book)            
+            }else if(book.shelf === "wantToRead"){
+              wantToRead.push(book)
+            }else if(book.shelf === "read"){
+              read.push(book)
+            } 
+          })
+        this.setState({currentlyReading,wantToRead,read})
+       
+}
+  updateShelf=(book,shelf)=>{
+
+           if(shelf === "currentlyReading" && (this.state.currentlyReading.findIndex(b => b.id === book.id) < 0)){
+              this.setState({currentlyReading:[...this.state.currentlyReading,book]})
+            }else if(shelf === "wantToRead" && (this.state.wantToRead.findIndex(b => b.id === book.id) < 0)){
+              this.setState({wantToRead:[...this.state.wantToRead,book]})
+            }else if(shelf === "read"&& (this.state.read.findIndex(b => b.id === book.id) < 0)){
+              this.setState({read:[...this.state.read,book]})
+            } 
+
+            BooksAPI.update(book, shelf).then((response) => {
+   
+
+             })
+
+  }
 	render() {
   		return (
           <div className="list-books">
@@ -47,8 +74,10 @@ class BookList extends React.Component{
                   <div className="bookshelf-books">
                     <ol className="books-grid">
                     {this.state.currentlyReading.map((book)=>{
-                        return <Books 
+                        return <Books key={book.id}
                                book={book}
+                              toggleShelf={(book, shelf) => this.updateShelf(book, shelf)}
+
                                 />                                                                		 
                     })}                    
                     </ol>
@@ -60,8 +89,9 @@ class BookList extends React.Component{
                     <ol className="books-grid">
                       
                     {this.state.wantToRead.map((book)=>{
-                        return <Books 
-                               book={book}
+                      return <Books 
+                      book={book}
+                      toggleShelf={(book, shelf) => this.updateShelf(book, shelf)}
                                />                                                                     
                     })}
                     </ol>
@@ -74,6 +104,7 @@ class BookList extends React.Component{
                     {this.state.read.map((book)=>{
                       return <Books 
                               book={book}
+                     toggleShelf={(book, shelf) => this.updateShelf(book, shelf)}
                              />                         
                     })}
                     </ol>

@@ -5,30 +5,47 @@ class Books extends React.Component{
 	
 	state={
 
-		shelf:""
+		shelf:"none"
 	}
 
-	toggleShelf = (shelf) => {
+componentDidMount(){
 
-	  this.setState({shelf})
-	  console.log(shelf)
+   const {book} = this.props
+      if(book.shelf){
+        this.setState({shelf: book.shelf})
+      }
+}
+	toggleShelf = (event) => {
+
+	  this.setState({shelf: event.target.value})
+	  console.log(this.state.shelf)
+    this.props.toggleShelf(this.props.book, event.target.value)
 	}
 		
 	render(){
 	    const {book} = this.props
-	    console.log(book)
+    
+	    //console.log(book)
 		return(
 
 			<li key={book.id}>
            		<div className="book">
                 	<div className="book-top">
+
+
+                    {(book.imageLinks)?  
                     	<div className="book-cover"
                     	style={{ width: 128, height: 193, 
                     	backgroundImage:`url(${book.imageLinks.thumbnail})`}}>
-                    	</div>
+                    	</div>:
+                      <div className="book-cover"
+                      style={{ width: 128, height: 193,}}>
+                      </div>}
+
+                      
                     	<div className="book-shelf-changer">
                       		<select 
-                      		onChange ={ (event) => {this.toggleShelf(event.target.value)}} 
+                      		onChange ={this.toggleShelf} 
                       		value ={this.state.shelf}
                       		>
                         		<option value="move" disabled>Move to...</option>
@@ -40,7 +57,7 @@ class Books extends React.Component{
                     	</div>
                   	</div>
                   	<div className="book-title">{book.title}</div>
-                  	<div className="book-authors">{book.authors}</div>
+                    { book.authors && <div className="book-authors">{book.authors}</div>}
                 </div>
             </li>
 	)}}
