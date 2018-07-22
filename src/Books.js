@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import * as BooksAPI from './BooksAPI'
 
 
 class Books extends React.Component{
@@ -8,26 +9,26 @@ class Books extends React.Component{
 		shelf:"none"
 	}
 
-componentDidMount(){
+  componentDidMount(){
 
    const {book} = this.props
       if(book.shelf){
         this.setState({shelf: book.shelf})
       }
-}
+  }
+
 	toggleShelf = (event) => {
 
 	  this.setState({shelf: event.target.value})
 	  console.log(this.state.shelf)
     this.props.toggleShelf(this.props.book, event.target.value)
+     BooksAPI.update(this.props.book, event.target.value).then((response) => { 
+    })
 	}
 		
 	render(){
 	    const {book} = this.props
-    
-	    //console.log(book)
-		return(
-
+  		return(
 			<li key={book.id}>
            		<div className="book">
                 	<div className="book-top">
@@ -37,7 +38,7 @@ componentDidMount(){
                     	<div className="book-cover"
                     	style={{ width: 128, height: 193, 
                     	backgroundImage:`url(${book.imageLinks.thumbnail})`}}>
-                    	</div>:
+                    	</div> :
                       <div className="book-cover"
                       style={{ width: 128, height: 193,}}>
                       </div>}
